@@ -7,6 +7,7 @@ angular.module('lectorQR.controller', ['ionic','ngCordova','ngStorage'])
 	}else{
 		$scope.logged=true;
 		$scope.username=$localStorage.user;
+		$scope.url=$localStorage.url;
 		$scope.password=$localStorage.password;
 	}
 	$scope.showAlert = function(tittle,message) {
@@ -16,11 +17,8 @@ angular.module('lectorQR.controller', ['ionic','ngCordova','ngStorage'])
 	   });
 	 };
 	$scope.logout=function(){
-		$localStorage.$reset();
 		$scope.logged=false;
-		$localStorage.user=undefined;
 		$localStorage.password=undefined;
-		$scope.username=undefined;
 		$scope.password=undefined;
 		
 
@@ -33,6 +31,7 @@ angular.module('lectorQR.controller', ['ionic','ngCordova','ngStorage'])
 	    		$scope.logged=true;
 	    		$localStorage.user=$scope.username;
 				$localStorage.password=$scope.password;
+				$localStorage.url=$scope.url;
 				
 	    	}else{
 	    		$scope.showAlert(data.status,data.message);
@@ -61,21 +60,23 @@ angular.module('lectorQR.controller', ['ionic','ngCordova','ngStorage'])
 	
 	$scope.leercodigo=function () {
 		$cordovaBarcodeScanner.scan().then(function(imagenEscaneada){
+			if (imagenEscaneada.text!=undefined){
 			$http.get(imagenEscaneada.text+'/?username='+$scope.username+'&password='+$scope.password)
 			    .success(function(data, status, headers,config){
 			      $scope.showAlert(data.status,data.message);
 			      
 			    })
 			    .error(function(data, status, headers,config){
-			      
+			      if (data.message){
+
 			      $scope.showAlert(data.status,data.message);
+			      }
 
 			    })
 			    .then(function(result){
 			     
 			});
-		},function(error){
-			alert(error);
+			    }
 		})
 	}
 	
